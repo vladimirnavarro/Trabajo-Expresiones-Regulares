@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Código</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #9394d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 1200px;
+            height: 50 0px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #resultado {
+            margin-top: 20px;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        /* Estilos adicionales para los cuadros */
+        .box {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: calc(45% - 20px); /* Ajusta el porcentaje según tus necesidades */
+            margin-bottom: 20px;
+        }
+
+        /* Estilos adicionales para el contenido */
+        .info-content {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+    <script>
+        const controlFlujo = {
+            IF_CONDITION: /\bCONSTRUIR\b/g,
+            ELSE_CONDITION: /\bNOCONSTRUIR\b/g,
+            FOR_LOOP: /\bPARAQUEHAGAS\b/g,
+            WHILE_LOOP: /\bMIENTRASHACES\b/g
+        };
+
+        const operadores = {
+            SUM: /\+/g,
+            RESTA: /-/g,
+            MULTIPLICACION: /\*/g,
+            DIVISION: /\//g,
+            MAYOR_QUE: />/g,
+            MAYOR_IGUAL_QUE: />=/g,
+            MENOR_QUE: /</g,
+            MENOR_IGUAL_QUE: /<=/g,
+            IGUAL: /==/g,
+            DIFERENTE: /!=/g,
+            ASIGNACION: /=/g
+        };
+
+        const tipoVariables = {
+            INT: /\bMARTILLO\s+([a-zA-Z_]\w*)\b/g,
+            STRING: /\bDESTORNILLADOR\s+([a-zA-Z_]\w*)\b/g,
+            BOOL: /\bSERRUCHO\s+([a-zA-Z_]\w*)\b/g,
+            FLOAT: /\bPALA\s+([a-zA-Z_]\w*)\b/g,
+            CHAR: /\bTIJERAS\s+([a-zA-Z_]\w*)\b/g,
+            DOUBLE: /\bTALADRO\s+([a-zA-Z_]\w*)\b/g
+        };
+
+
+        function encontrarPalabrasClaves(cadena){
+            const palabrasClavesFlujo = Object.values(controlFlujo);
+            const palabrasClavesOperadores = Object.values(operadores);
+            const palabrasClavesTipoVariables = Object.values(tipoVariables);  
+
+            let control_flujo = [];
+            let operadores_basicos = [];
+            let variables = [];
+            let variablesEncontradas = [];
+
+            palabrasClavesFlujo.forEach(expresion => {
+                const coincidencias = cadena.match(expresion) || [];
+                control_flujo.push(...coincidencias);
+            });
+
+            palabrasClavesOperadores.forEach(expresion =>{
+                const coincidencias = cadena.match(expresion) || [];
+                operadores_basicos.push(...coincidencias);
+            });
+
+            palabrasClavesTipoVariables.forEach(expresion =>{
+                let match;
+                while((match = expresion.exec(cadena)) !== null){
+                    variables.push(match[0]);
+                    variablesEncontradas.push(match[1]);
+                }
+            });
+
+            return{
+                control_flujo,
+                operadores_basicos,
+                variables,
+                variablesEncontradas
+            };
+        }
+
+        function analizarCodigo() {
+        const codigo = document.getElementById('codigo').value;
+        const palabrasClaveEncontradas = encontrarPalabrasClaves(codigo);
+        const resultadoDiv = document.getElementById('resultado');
+
+        // Crear una lista de resultados
+        let listaResultados = `
+            <ul>
+                <li> Control de flujo: ${palabrasClaveEncontradas.control_flujo.join(', ')}</li>
+                <li> Operadores: ${palabrasClaveEncontradas.operadores_basicos.join(', ')}</li>
+                <li> Tipos de Variables: ${palabrasClaveEncontradas.variables.join(', ')}</li>
+                <li> Variables Encontradas: ${palabrasClaveEncontradas.variablesEncontradas.join(', ')}</li>
+            </ul>
+        `;
+
+        // Insertar la lista en el div de resultados
+        resultadoDiv.innerHTML = listaResultados;
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Cuadro de análisis de código -->
+        <div class="box">
+            <h1>Análisis de Código</h1>
+            <textarea id="codigo" rows="10" placeholder="Escribe tu código aquí..."></textarea>
+            <button onclick="analizarCodigo()">Analizar Código</button>
+            <div id="resultado">
+                <!-- Aquí se mostrarán los resultados -->
+            </div>
+        </div>
+
+        <!-- Cuadro de información del lenguaje -->
+        <div class="box">
+            <h1>Información del Lenguaje</h1>
+            <textarea id="info" rows="10" readonly>
+    En nuestro lenguaje, las palabras clave de control de flujo son:
+    - If -> CONSTRUIR
+    - Else -> NOCONSTRUIR
+    - For -> PARAQUEHAGAS
+    - While -> MIENTRASHACES
+
+    Los operadores definidos en nuestro lenguaje son:
+    - Suma (+)
+    - Resta (-)
+    - Multiplicación (*)
+    - División (/)
+    - Mayor que (>)
+    - Mayor o igual que (>=)
+    - Menor que (<)
+    - Menor o igual que (<=)
+    - Igual a (==)
+    - Diferente de (!=)
+    - Asignación (=)
+
+    Los tipos de variables definidos en nuestro lenguaje son:
+    - INT (entero) ->  MARTILLO
+    - STRING (cadena de caracteres) -> DESTORNILLADOR
+    - BOOL (booleano) -> SERRUCHO
+    - FLOAT (número decimal) -> PALA
+    - CHAR (carácter) -> TIJERAS
+    - DOUBLE (número decimal de doble precisión) -> TALADRO
+            </textarea>
+        </div>
+    </div>
+</body>
+</html>
